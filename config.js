@@ -2,7 +2,7 @@
 window.STUDY = {
   name: 'MyHome prototype test',
   // Where testers send results. Leave blank to hide that option.
-  contactEmail: '',          // e.g. 'research@yourdomain.co.uk' — results open in the tester's email app
+  contactEmail: 'preferred.femisayo@gmail.com',          // e.g. 'research@yourdomain.co.uk' — results open in the tester's email app
   postUrl: '',               // optional: a form endpoint (e.g. Formspree) that accepts JSON POSTs
   minutes: 15,
   tasks: [
