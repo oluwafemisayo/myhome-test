@@ -16,8 +16,8 @@ body{margin:0;background:#E9E6DE;font-family:'Inter Tight',system-ui,sans-serif;
 <div class="top"><a href="javascript:history.back()">‹ Back to the app</a><span style="opacity:.8;font-size:13px">What a broker would see (example)</span></div>
 <div id="outer" style="overflow:hidden;width:100%"><div id="wrap" style="width:794px"><div id="app"></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/preact@10.19.3/dist/preact.umd.js"></script>
-<script src="runtime.js"></script>
-<script src="pack.js"></script>
+<script src="runtime.js?v=2e9f421b"></script>
+<script src="pack.js?v=25e79775"></script>
 <script>
 mountDC(document.getElementById('app'), { state: 'With gaps' });
 function fit() { const vw = Math.min(document.getElementById('outer').clientWidth || innerWidth, screen.width || innerWidth); const s = Math.min(1, vw / 794); const w = document.getElementById('wrap'); w.style.transform = 'scale(' + s + ')'; w.style.height = (1123 * s) + 'px'; }

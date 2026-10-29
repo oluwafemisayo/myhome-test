@@ -90,3 +90,20 @@ def build(name, out, links, design=None, transform=None):
 build('Main.dc.html', 'app.js', {'Pack.dc.html': 'pack.html'}, design='current')
 build('Main.dc.html', 'app-hearth.js', {'Pack.dc.html': 'pack.html'}, design='hearth', transform=hearth)
 build('Pack.dc.html', 'pack.js', {})
+
+
+def stamp(page, files):
+    """Add ?v=<content hash> to each script/stylesheet so browsers fetch changed files at once
+    (GitHub Pages lets browsers keep files for 10 minutes)."""
+    import hashlib
+    path = os.path.join(HERE, page)
+    s = open(path, encoding='utf-8').read()
+    for f in files:
+        v = hashlib.sha1(open(os.path.join(HERE, f), 'rb').read()).hexdigest()[:8]
+        s = re.sub(r'(src|href)="%s(?:\?v=[0-9a-f]+)?"' % re.escape(f), r'\1="%s?v=%s"' % (f, v), s)
+    open(path, 'w', encoding='utf-8').write(s)
+    print('stamped', page)
+
+
+stamp('index.html', ['tester.css', 'config.js', 'runtime.js', 'app.js', 'app-hearth.js', 'tester.js'])
+stamp('pack.html', ['runtime.js', 'pack.js'])
