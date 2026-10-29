@@ -12,6 +12,7 @@ window.STUDY = {
     { id: 't4', title: 'Check a rental before you apply', hint: 'You’re thinking about moving. Find out whether 23 Garden Terrace breaks any rental rules.' },
     { id: 't5', title: 'Get ready to buy', hint: 'Build your mortgage-ready pack and send it to a broker.' },
     { id: 't6', title: 'Find a solicitor', hint: 'After an offer is accepted, find a solicitor and ask one for a quote.' },
-    { id: 't7', title: 'Plan a to-do with a date', hint: 'Add “Book the van” to a list, due next week.' }
+    { id: 't7', title: 'Plan a to-do with a date', hint: 'Add “Book the van” to a list, due next week.' },
+    { id: 't8', title: 'Talk to Ara', hint: 'Without typing, ask Ara to remind you to pay the window cleaner on Friday. Then ask when your rent is due.' }
   ]
 };
