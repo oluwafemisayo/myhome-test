@@ -1,0 +1,1 @@
+{ "name": "MyHome prototype", "short_name": "MyHome", "start_url": "./index.html", "display": "standalone", "background_color": "#F2F0EA", "theme_color": "#F2F0EA", "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }] }

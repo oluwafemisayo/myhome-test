@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F0EA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="robots" content="noindex">
+<title>MyHome — prototype test</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="tester.css">
+</head>
+<body>
+<div id="bar" role="toolbar" aria-label="Test controls"><span class="dot" aria-hidden="true"></span><button id="barTask">Tasks</button><button id="barFb">Feedback</button></div>
+<main id="shell"><div id="app"></div></main>
+<div id="welcome" hidden></div>
+<div id="sheet" hidden></div>
+<div id="ttoast" role="status" hidden></div>
+<div id="err" hidden role="alert"><div class="w-card"><h2>Something went wrong</h2><p>That’s our fault, not yours. Restart the app and carry on — your task progress is kept.</p><button class="btn primary" id="errReset">Restart the app</button></div></div>
+<script src="https://cdn.jsdelivr.net/npm/preact@10.19.3/dist/preact.umd.js"></script>
+<script src="config.js"></script>
+<script src="runtime.js"></script>
+<script src="app.js"></script>
+<script src="tester.js"></script>
+</body>
+</html>
