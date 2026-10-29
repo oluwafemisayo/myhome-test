@@ -48,20 +48,23 @@
     return h(tag, props, ...kids.map((k) => build(k, scope)));
   }
 
-  window.mountDC = function (container, props, hooks) {
+  // def = { head, tree, Component } from DC_APPS; falls back to the single-app globals (pack page)
+  window.mountDC = function (container, props, hooks, def) {
     hooks = hooks || {};
-    if (window.DC_HEAD && !document.getElementById('dc-head')) {
-      const holder = document.createElement('div'); holder.innerHTML = window.DC_HEAD;
-      Array.from(holder.children).forEach((el, i) => { if (i === 0) el.id = 'dc-head-first'; document.head.appendChild(el); });
-      const mark = document.createElement('meta'); mark.id = 'dc-head'; document.head.appendChild(mark);
+    def = def || { head: window.DC_HEAD, tree: window.DC_TREE, Component: window.DC_COMPONENT };
+    if (def.head && window.__dcHeadFor !== def) {
+      document.querySelectorAll('[data-dc-head]').forEach((el) => el.remove());
+      const holder = document.createElement('div'); holder.innerHTML = def.head;
+      Array.from(holder.children).forEach((el) => { el.setAttribute('data-dc-head', ''); document.head.appendChild(el); });
+      window.__dcHeadFor = def;
     }
-    const C = window.DC_COMPONENT;
+    const C = def.Component;
     const comp = new C(props || {});
     let queued = false;
     const draw = () => {
       queued = false;
       let tree;
-      try { tree = build(window.DC_TREE, { root: comp.renderVals(), vars: {} }); }
+      try { tree = build(def.tree, { root: comp.renderVals(), vars: {} }); }
       catch (e) { console.error(e); if (hooks.onError) hooks.onError(e); return; }
       render(h('div', { style: 'display:contents' }, tree), container);
       if (comp.componentDidUpdate) { try { comp.componentDidUpdate(); } catch (e) { console.error(e); } }

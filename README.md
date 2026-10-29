@@ -41,6 +41,16 @@ The page sets `noindex`, so search engines won't list it. Anyone with the link c
 - `…/index.html?start=Renting%2C%20set%20up`: skips onboarding, already renting.
 - Other starts: `Buying (no renting)`, `Buying (offer accepted)`, `Owning (after renting)`, `Owning (never rented)`.
 
+## Comparing two designs
+
+The app is built in two designs from the same source: the current one (`app.js`) and Hearth (`app-hearth.js`). `designs` in `config.js` controls who sees what:
+
+- `'both'` (default): every tester does all tasks in one design, then repeats the `compareTasks` (rent increase, scanning a bill, a dated to-do) in the other and says which they prefer. Half start with each design, at random.
+- `'random'`: each tester sees one design.
+- `'current'` or `'hearth'`: everyone sees that one.
+
+Links can override it: `?design=hearth` or `?design=current` (one design only), `?order=hearth-first` or `?order=current-first`. Results record the design order, which design each task was done in, and the preference answers.
+
 Testers can add it to their home screen (Share → Add to Home Screen on iPhone; ⋮ → Add to home screen on Android) so it opens like an app.
 
 ## Updating after prototype changes
@@ -51,7 +61,7 @@ The app is generated from `../prototype-source/project/Main.dc.html`:
 python3 tester-web/build.py
 ```
 
-Then upload the folder again.
+This also rebuilds the Hearth version with `../prototype-source/tools/make_hearth.py`. Then upload the changed files again (usually `app.js` and `app-hearth.js`).
 
 ## Good to know
 

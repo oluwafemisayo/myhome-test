@@ -4,7 +4,12 @@ window.STUDY = {
   // Where testers send results. Leave blank to hide that option.
   contactEmail: 'preferred.femisayo@gmail.com',          // e.g. 'research@yourdomain.co.uk' — results open in the tester's email app
   postUrl: '',               // optional: a form endpoint (e.g. Formspree) that accepts JSON POSTs
-  minutes: 15,
+  minutes: 20,
+  // Design comparison: 'both' (each tester tries both, order alternates), 'random' (one each),
+  // or 'current' / 'hearth' (everyone sees that one). A link can force one: ?design=hearth
+  designs: 'both',
+  // Tasks repeated in the second design when designs is 'both'
+  compareTasks: ['t2', 't3', 't7'],
   tasks: [
     { id: 't1', title: 'Get set up as a renter', hint: 'Start the app as someone who rents, and add the home you rent now.' },
     { id: 't2', title: 'Understand a rent increase', hint: 'You’ve had a letter about your rent going up. Find out what it means and what you could do.' },
