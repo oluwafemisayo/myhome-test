@@ -88,8 +88,9 @@ def build(name, out, links, design=None, transform=None):
 
 
 build('Main.dc.html', 'app.js', {'Pack.dc.html': 'pack.html'}, design='current')
-build('Main.dc.html', 'app-hearth.js', {'Pack.dc.html': 'pack.html'}, design='hearth', transform=hearth)
+build('Main.dc.html', 'app-hearth.js', {'PackHearth.dc.html': 'pack.html?design=hearth'}, design='hearth', transform=hearth)
 build('Pack.dc.html', 'pack.js', {})
+build('Pack.dc.html', 'pack-hearth.js', {}, transform=hearth)
 
 
 def stamp(page, files):
@@ -100,10 +101,11 @@ def stamp(page, files):
     s = open(path, encoding='utf-8').read()
     for f in files:
         v = hashlib.sha1(open(os.path.join(HERE, f), 'rb').read()).hexdigest()[:8]
-        s = re.sub(r'(src|href)="%s(?:\?v=[0-9a-f]+)?"' % re.escape(f), r'\1="%s?v=%s"' % (f, v), s)
+        # matches "file" in attributes and 'file' inside the pack page's loader script
+        s = re.sub(r'(["\'])%s(?:\?v=[0-9a-f]+)?(["\'])' % re.escape(f), r'\g<1>%s?v=%s\g<2>' % (f, v), s)
     open(path, 'w', encoding='utf-8').write(s)
     print('stamped', page)
 
 
 stamp('index.html', ['tester.css', 'config.js', 'runtime.js', 'app.js', 'app-hearth.js', 'tester.js'])
-stamp('pack.html', ['runtime.js', 'pack.js'])
+stamp('pack.html', ['runtime.js', 'pack.js', 'pack-hearth.js'])

@@ -6,8 +6,8 @@
 <meta name="robots" content="noindex">
 <title>Mortgage-ready pack — MyHome prototype</title>
 <style>
-body{margin:0;background:#E9E6DE;font-family:'Inter Tight',system-ui,sans-serif;overflow-x:hidden}
-.top{position:sticky;top:0;z-index:2;background:#17181C;color:#fff;display:flex;align-items:center;gap:10px;padding:8px 12px}
+body{margin:0;background:#E4E5E8;font-family:system-ui,-apple-system,sans-serif;overflow-x:hidden}
+.top{position:sticky;top:0;z-index:2;background:#1F2024;color:#fff;display:flex;align-items:center;gap:10px;padding:8px 12px}
 .top a{color:#fff;font-weight:600;min-height:44px;display:inline-flex;align-items:center}
 #wrap{transform-origin:top left}
 </style>
@@ -17,7 +17,7 @@ body{margin:0;background:#E9E6DE;font-family:'Inter Tight',system-ui,sans-serif;
 <div id="outer" style="overflow:hidden;width:100%"><div id="wrap" style="width:794px"><div id="app"></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/preact@10.19.3/dist/preact.umd.js"></script>
 <script src="runtime.js?v=2e9f421b"></script>
-<script src="pack.js?v=25e79775"></script>
+<script>document.write('<script src="' + (/design=hearth/.test(location.search) ? 'pack-hearth.js?v=1aa7ee00' : 'pack.js?v=25e79775') + '"><\/script>');</script>
 <script>
 mountDC(document.getElementById('app'), { state: 'With gaps' });
 function fit() { const vw = Math.min(document.getElementById('outer').clientWidth || innerWidth, screen.width || innerWidth); const s = Math.min(1, vw / 794); const w = document.getElementById('wrap'); w.style.transform = 'scale(' + s + ')'; w.style.height = (1123 * s) + 'px'; }
