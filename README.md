@@ -41,6 +41,12 @@ The page sets `noindex`, so search engines won't list it. Anyone with the link c
 - `…/index.html?start=Renting%2C%20set%20up`: skips onboarding, already renting.
 - Other starts: `Buying (no renting)`, `Buying (offer accepted)`, `Owning (after renting)`, `Owning (never rented)`.
 
+## Tasks and end questions
+
+Each task in `config.js` names the example the app should open in (`start`), for example `Buying (no renting)` for the offer and broker tasks or `Owning (after renting)` for remortgaging. The app only switches when a task needs a different example, and the tester sees a short note when it does. Tasks 9–11 lead to the revenue screens: the Buying pass, broker comparison with fees disclosed, and remortgage help.
+
+`questions` are asked at the end. A question with `after` only appears if the tester tried one of those tasks, so nobody is asked about a screen they never saw. Answers appear in the results under "Prices and trust".
+
 ## Comparing two designs
 
 The app is built in two designs from the same source: the current one (`app.js`) and Hearth (`app-hearth.js`). `designs` in `config.js` controls who sees what:

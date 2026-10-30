@@ -37,11 +37,13 @@
   const results = () => inPart2() ? st.tasks2 : st.tasks;
 
   let app = null; let lastScreen = null;
-  function startApp() {
+  // start: which example the app opens in. Tasks can ask for their own (config.js → task.start).
+  function startApp(want) {
     if (app) app.unmount();
     const apps = window.DC_APPS || {};
     const def = apps[design()] || apps.current;
-    const start = inPart2() ? 'Renting, set up' : (params.get('start') || 'Onboarding');
+    const start = inPart2() ? 'Renting, set up' : (want || st.appStart || params.get('start') || 'Onboarding');
+    st.appStart = start; lastScreen = null;
     document.documentElement.setAttribute('data-design', design());
     app = window.mountDC($('#app'), { startAt: start }, {
       afterRender: (comp) => { const s = comp.state && comp.state.screen; if (s && s !== lastScreen) { lastScreen = s; log('screen', { screen: s, task: st.current }); } },
@@ -92,9 +94,16 @@
     document.querySelectorAll('.task').forEach((b) => b.addEventListener('click', () => { startTask(b.dataset.id); }));
     if (cur) { $('#done').addEventListener('click', () => endTask('done')); $('#stuck').addEventListener('click', () => endTask('stuck')); }
     $('#close').addEventListener('click', closeSheet);
-    $('#finish').addEventListener('click', () => { if (both() && st.phase === 1) part2Intro(); else if (both()) preference(); else showResults(); });
+    $('#finish').addEventListener('click', () => { if (both() && st.phase === 1) part2Intro(); else if (both()) preference(); else lastQuestions(); });
   }
-  function startTask(id) { const R = results(); st.current = id; R[id] = Object.assign({}, R[id], { started: now(), result: null }); log('task-start', { task: id, screen: lastScreen }); save(); updateBar(); closeSheet(); }
+  function startTask(id) {
+    const R = results(); const t = taskList().find((x) => x.id === id) || {};
+    const switching = !inPart2() && t.start && t.start !== st.appStart;
+    st.current = id; R[id] = Object.assign({}, R[id], { started: now(), result: null });
+    if (switching) startApp(t.start);
+    log('task-start', { task: id, screen: lastScreen, start: st.appStart }); save(); updateBar(); closeSheet();
+    if (switching) toast(t.start === 'Onboarding' ? 'The app has restarted from the beginning for this task.' : 'The app has switched to a ready-made example for this task.');
+  }
   function endTask(result) {
     const R = results(); const id = st.current; const t = R[id] || {}; const secs = t.started ? Math.round((Date.now() - Date.parse(t.started)) / 1000) : null;
     sheet('<h2>' + (result === 'done' ? 'Nice one' : 'Thanks, that’s useful') + '</h2><label class="lbl" for="tnote">' + (result === 'done' ? 'Anything confusing along the way? (optional)' : 'Where did you get stuck? (optional)') + '</label><textarea id="tnote" rows="4"></textarea><div class="row"><button class="btn primary" id="tsave">Save</button></div>');
@@ -120,7 +129,23 @@
       '<label class="lbl" for="why">Why? (optional)</label><textarea id="why" rows="3"></textarea><div class="row"><button class="btn primary" id="psave">Save and see results</button></div>');
     $('#psave').addEventListener('click', () => {
       const val = (q) => { const el = document.querySelector('input[name="' + q + '"]:checked'); if (!el) return null; return el.value === 'first' ? st.order[0] : el.value === 'second' ? st.order[1] : 'no difference'; };
-      st.pref = { overall: val('overall'), easierToRead: val('read'), easierToFind: val('find'), why: $('#why').value.trim() }; log('preference', st.pref); save(); showResults();
+      st.pref = { overall: val('overall'), easierToRead: val('read'), easierToFind: val('find'), why: $('#why').value.trim() }; log('preference', st.pref); save(); lastQuestions();
+    });
+  }
+
+  // ----- short questions on price and trust (config.js → questions), shown only after the related tasks
+  function lastQuestions() {
+    const tried = (id) => !!(st.tasks[id] && st.tasks[id].started) || !!(st.tasks2[id] && st.tasks2[id].started);
+    const qs = (S.questions || []).filter((q) => !q.after || q.after.some(tried));
+    if (!qs.length) { showResults(); return; }
+    const group = (q) => '<fieldset class="fs"><legend>' + esc(q.ask) + '</legend>' + q.options.map((o, i) => '<label class="opt"><input type="radio" name="q-' + q.id + '" value="' + i + '"> ' + esc(o) + '</label>').join('') + '</fieldset>';
+    sheet('<span class="kick">NEARLY DONE</span><h2>A few quick questions</h2><p class="sub">About prices and how MyHome would be paid. There are no right answers. Skip any you like.</p>' +
+      qs.map(group).join('') + '<label class="lbl" for="qnote">Anything else about prices or partners? (optional)</label><textarea id="qnote" rows="3"></textarea>' +
+      '<div class="row"><button class="btn primary" id="qsave">Save and see results</button></div>');
+    $('#qsave').addEventListener('click', () => {
+      const ans = {}; qs.forEach((q) => { const el = document.querySelector('input[name="q-' + q.id + '"]:checked'); ans[q.id] = el ? q.options[+el.value] : null; });
+      st.answers = { asked: qs.map((q) => ({ id: q.id, ask: q.ask, answer: ans[q.id] })), note: $('#qnote').value.trim() };
+      log('questions', { answers: ans }); save(); showResults();
     });
   }
 
@@ -133,13 +158,14 @@
     const rows = (R, list, d) => list.map((t) => Object.assign({ id: t.id, title: t.title, design: d }, R[t.id] || {}));
     const part2 = both() ? rows(st.tasks2, S.tasks.filter((t) => (S.compareTasks || []).indexOf(t.id) >= 0), st.order[1]) : [];
     return { study: S.name, participant: st.pid, started: st.started, finished: now(), designOrder: st.order, device: navigator.userAgent, screenSize: innerWidth + 'x' + innerHeight,
-      tasks: rows(st.tasks, S.tasks, st.order ? st.order[0] : design()), part2Tasks: part2, preference: st.pref,
+      tasks: rows(st.tasks, S.tasks, st.order ? st.order[0] : design()), part2Tasks: part2, preference: st.pref, answers: st.answers || null,
       feedback: st.events.filter((e) => e.type === 'feedback'), path: st.events.filter((e) => e.type === 'screen').map((e) => e.screen + (e.task ? '@' + e.task : '') + '#' + e.design), events: st.events };
   }
   function plain(sm) {
     const line = (t, i) => (i + 1) + '. ' + t.title + ': ' + (t.result || 'not tried') + (t.seconds != null ? ' (' + t.seconds + 's)' : '') + (t.note ? ' — ' + t.note : '');
     let out = 'MyHome test · participant ' + sm.participant + '\nDesign order: ' + (sm.designOrder || []).join(' then ') + '\n\nPart 1 tasks (' + (sm.designOrder ? sm.designOrder[0] : '') + ')\n' + sm.tasks.map(line).join('\n');
     if (sm.part2Tasks.length) out += '\n\nPart 2 tasks (' + sm.designOrder[1] + ')\n' + sm.part2Tasks.map(line).join('\n');
+    if (sm.answers) out += '\n\nPrices and trust\n' + sm.answers.asked.map((a) => a.ask + ' ' + (a.answer || 'no answer')).join('\n') + (sm.answers.note ? '\nNote: ' + sm.answers.note : '');
     if (sm.preference) out += '\n\nPreference\nWould rather use: ' + (sm.preference.overall || 'no answer') + '\nEasier to read: ' + (sm.preference.easierToRead || 'no answer') + '\nEasier to find things: ' + (sm.preference.easierToFind || 'no answer') + (sm.preference.why ? '\nWhy: ' + sm.preference.why : '');
     out += '\n\nFeedback\n' + (sm.feedback.map((f) => '[' + f.design + ' · ' + f.screen + '] ' + f.text).join('\n') || 'none') + '\n\nScreens\n' + sm.path.join(' > ');
     return out;
